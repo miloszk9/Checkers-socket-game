@@ -3,24 +3,29 @@ from _thread import *
 from socket import *
 
 
-def threaded_client(connection, client_id, lobby_id): 
-    global players, connections, lobbies
-    
-    id = client_id
-    players.append(id)
+def threaded_client(connection, player_id, opponent_id, lobby_id, starting): 
+    global connections, lobbies
 
-    connection.send(pickle.dumps(lobbies[lobby_id]))
+    if starting:
+        connection.send(pickle.dumps(True))
+    else:
+        connection.send(pickle.dumps(False))
 
     while True:
 
         try:
-            data = connection.recv(2048 * 12)
-            update = pickle.loads(data)
+            if lobbies[lobby_id]['client_turn'] == player_id:
+                lobbies[lobby_id]['client_turn'] = None
 
-            lobbies[lobby_id].append(update)
+                send_data = pickle.dumps(lobbies[lobby_id]['data'])
+                connection.send(send_data)
 
-            send_data = pickle.dumps(lobbies[lobby_id])
-            connection.send(send_data)
+                data = connection.recv(2048 * 4)
+                update = pickle.loads(data)
+
+                lobbies[lobby_id]['data'].append(update)
+
+                lobbies[lobby_id]['client_turn'] = opponent_id
 
         except Exception as e:
             print(e)
@@ -53,7 +58,6 @@ if __name__ == '__main__':
     print("Waiting for a connection")
 
     # Game global variables
-    players = list()
     lobbies = list()
     connections = 0
     player_queue = None
@@ -66,9 +70,9 @@ if __name__ == '__main__':
         id += 1  # Next client will recive incremented id value
 
         if player_queue is not None:
-            lobbies.append([])
-            start_new_thread(threaded_client, (client, id, len(lobbies)-1))
-            start_new_thread(threaded_client, (*player_queue, len(lobbies)-1))
+            lobbies.append({'client_turn': id, 'data': []})
+            start_new_thread(threaded_client, (client, id, player_queue[1], len(lobbies)-1, False))
+            start_new_thread(threaded_client, (*player_queue, id, len(lobbies)-1, False))
             player_queue = None
         else:
             player_queue = (client, id)

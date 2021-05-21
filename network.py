@@ -11,7 +11,7 @@ class Network:
 
     def connect(self):
         self.client.connect(self.addr)
-        data = self.client.recv(2048 * 6)
+        data = self.client.recv(2048 * 4)
         return pickle.loads(data)
 
     def disconnect(self):
@@ -21,13 +21,18 @@ class Network:
 
         try:
             self.client.send(pickle.dumps(data))
-            reply = self.client.recv(2048 * 6)
-            try:
-                reply = pickle.loads(reply)
-            except Exception as e:
-                print(e)
-
-            return reply
+            return True
         
         except socket.error as e:
             print(e)
+            return False
+
+    def recive(self):
+        reply = self.client.recv(2048 * 4)
+
+        try:
+            reply = pickle.loads(reply)
+        except Exception as e:
+            print(e)
+
+        return reply
