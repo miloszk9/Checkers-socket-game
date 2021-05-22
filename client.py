@@ -6,14 +6,21 @@ def main():
 
     # connect to server and get data
     network = Network()
-    messages = network.connect()
+    my_turn = network.connect()
     
+    messages = []
     input_data = ''
 
     while input_data != 'exit':
-        input_data = str(input())
-        messages = network.send(input_data)
-        print(messages)
+        if my_turn == True:
+            input_data = str(input('Enter message: '))
+            network.send(input_data)
+            my_turn = False
+        else:
+            print('Wait for response...')
+            messages = network.recive()
+            print(messages)
+            my_turn = True
 
     network.disconnect()
     quit()
