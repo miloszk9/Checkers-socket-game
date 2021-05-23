@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
         if player_queue is not None:
             lobbies.append({'client_turn': id, 'data': []})
-            start_new_thread(threaded_client, (client, id, player_queue[1], len(lobbies)-1, False))
+            start_new_thread(threaded_client, (client, id, player_queue[1], len(lobbies)-1, True))
             start_new_thread(threaded_client, (*player_queue, id, len(lobbies)-1, False))
             player_queue = None
         else:

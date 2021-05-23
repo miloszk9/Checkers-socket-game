@@ -8,6 +8,9 @@ def main():
     network = Network()
     my_turn = network.connect()
     
+    if my_turn:
+        messages = network.recive()
+
     messages = []
     input_data = ''
 
