@@ -1,5 +1,5 @@
 import pygame
-from constants import WIDTH, HEIGHT
+from constants import WIDTH, HEIGHT, ROWS, COLS
 from board import Board
 
 '''
@@ -14,6 +14,9 @@ pygame.display.set_caption('Warcaby')
 pygame.display.set_icon(programIcon)
 
 
+def clicked_pos(position):
+    return int(position[0]/(WIDTH/ROWS)), int(position[1]/(HEIGHT/COLS))
+
 def main():
     run = True
     clock = pygame.time.Clock()
@@ -27,8 +30,9 @@ def main():
                 run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
-
+                pos = pygame.mouse.get_pos()
+                x, y =  clicked_pos(pos)
+                
 
         board.draw_board(WINDOW)
         board.draw_pieces(WINDOW)

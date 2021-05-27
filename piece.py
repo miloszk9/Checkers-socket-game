@@ -3,7 +3,8 @@ from constants import SQUARE_SIZE, WHITE
 
 class Piece:
 
-    def __init__(self, row, col, color, image):
+    def __init__(self, id, row, col, color, image):
+        self.id = id
         self.row = row
         self.col = col
         self.color = color

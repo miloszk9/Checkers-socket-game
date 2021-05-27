@@ -6,35 +6,39 @@ from constants import BLACK, BRIGHT, BRIGHT, COLS, DARK, ROWS, SQUARE_SIZE, WHIT
 
 class Board:
     def __init__(self):
-        self.board = []
+        self.board_color = []
+        self.board_pieces = []
         self.starting_list = []
-        self.pieces_list = []
+        self.color_board()
         self.create_board()
-        self.create_pieces()
 
 
     #Board definition 1-black, 0-white
-    def create_board(self):
-        self.board = np.zeros((8,8),dtype=int)
-        self.board[1::2,::2] = 1
-        self.board[::2,1::2] = 1
+    def color_board(self):
+        self.board_color = np.zeros((8,8),dtype=int)
+        self.board_color[1::2,::2] = 1
+        self.board_color[::2,1::2] = 1
 
-    def create_pieces(self):
+    def create_board(self):
+        self.board_pieces = ([], [], [], [], [], [], [], [])
+        for i in range(8):
+            for _ in range(8):
+                self.board_pieces[i].append(None)
         for i in range(24):
             if i < 12:
                 pos = self.starting_position(i)
-                piece = Piece(pos[0], pos[1], "white", WHITE)
-                self.pieces_list.append(piece)
+                piece = Piece(i, pos[0], pos[1], "white", WHITE)
+                self.board_pieces[pos[0]][pos[1]] = piece
                 print("ID: ", i, "column: ", piece.col, "row: ", piece.row ,"color: ", piece.color, " created")
             else:
                 pos = self.starting_position(i)
-                piece = Piece(pos[0], pos[1], "black", BLACK)
-                self.pieces_list.append(piece)
+                piece = Piece(i, pos[0], pos[1], "black", BLACK)
+                self.board_pieces[pos[0]][pos[1]] = piece
                 print("ID: ", i, "column: ", piece.col, "row: ", piece.row ,"color: ", piece.color, " created")
 
     def starting_position(self, id): 
         index = 0
-        for row in self.board:
+        for row in self.board_color:
             indey = 0
             for cell in row:
                 if 0 <= index <= 2 or 5 <= index <= 7:
@@ -52,8 +56,14 @@ class Board:
                 pygame.draw.rect(window, BRIGHT, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     def draw_pieces(self, window):
-        for piece in self.pieces_list:
-            window.blit(piece.image, pygame.Rect(piece.col*SQUARE_SIZE, piece.row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+        for row in range(8):
+            for col in range(8):
+                if self.board_pieces[row][col] is not None:
+                    window.blit(self.board_pieces[row][col].image,
+                                pygame.Rect(self.board_pieces[row][col].col*SQUARE_SIZE,
+                                self.board_pieces[row][col].row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
+    def is_piece(self, x, y):
+        pass
 
 # s = Board()
