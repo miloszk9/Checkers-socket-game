@@ -29,12 +29,12 @@ class Board:
                 pos = self.starting_position(i)
                 piece = Piece(i, pos[0], pos[1], "white", WHITE)
                 self.board_pieces[pos[0]][pos[1]] = piece
-                print("ID: ", i, "column: ", piece.col, "row: ", piece.row ,"color: ", piece.color, " created")
+                print("ID: ", i, "column: ", piece.starting_col, "row: ", piece.starting_row ,"color: ", piece.color, " created")
             else:
                 pos = self.starting_position(i)
                 piece = Piece(i, pos[0], pos[1], "black", BLACK)
                 self.board_pieces[pos[0]][pos[1]] = piece
-                print("ID: ", i, "column: ", piece.col, "row: ", piece.row ,"color: ", piece.color, " created")
+                print("ID: ", i, "column: ", piece.starting_col, "row: ", piece.starting_row ,"color: ", piece.color, " created")
 
     def starting_position(self, id): 
         index = 0
@@ -60,10 +60,14 @@ class Board:
             for col in range(8):
                 if self.board_pieces[row][col] is not None:
                     window.blit(self.board_pieces[row][col].image,
-                                pygame.Rect(self.board_pieces[row][col].col*SQUARE_SIZE,
-                                self.board_pieces[row][col].row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                                pygame.Rect(col*SQUARE_SIZE, row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     def is_piece(self, x, y):
-        pass
+        if self.board_pieces[y][x] is not None:
+            return True
+        else:
+            return False
 
-# s = Board()
+    def move_piece(self, start_x, start_y, dest_x, dest_y):
+        self.board_pieces[dest_y][dest_x] = self.board_pieces[start_y][start_x]
+        self.board_pieces[start_y][start_x] = None

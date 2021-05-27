@@ -5,8 +5,8 @@ class Piece:
 
     def __init__(self, id, row, col, color, image):
         self.id = id
-        self.row = row
-        self.col = col
+        self.starting_row = row
+        self.starting_col = col
         self.color = color
         self.image = image
         self.super = False
@@ -17,7 +17,3 @@ class Piece:
     
     def make_dead(self):
         self.dead = False
-
-    def move(self, row, col):
-        self.row = row
-        self.col = col
