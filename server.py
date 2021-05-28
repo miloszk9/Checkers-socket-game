@@ -21,9 +21,7 @@ def threaded_client(connection, player_id, opponent_id, lobby_id, starting):
                 connection.send(send_data)
 
                 data = connection.recv(2048 * 4)
-                update = pickle.loads(data)
-
-                lobbies[lobby_id]['data'].append(update)
+                lobbies[lobby_id]['data'] = pickle.loads(data)
 
                 lobbies[lobby_id]['client_turn'] = opponent_id
 
