@@ -43,6 +43,18 @@ def main():
     while run:
         clock.tick(FPS)
 
+        board.draw_board(WINDOW)
+        board.draw_pieces(WINDOW)
+        pygame.display.update()
+
+        if my_turn == False:
+            print('Wait for response...')
+            data_recive = network.recive()
+            
+            if data_recive is not None:
+                board.move_piece(*data_recive)
+                my_turn = True
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -54,16 +66,6 @@ def main():
                     print("X: "+ str(x) + ' Y: ' + str(y))
                     piece_clicked = turn(x, y, piece_clicked)
                     print('Piece clicked: '+str(piece_clicked))
-
-        board.draw_board(WINDOW)
-        board.draw_pieces(WINDOW)
-        pygame.display.update()
-
-        if my_turn == False:
-            print('Wait for response...')
-            data_recive = network.recive()
-            board.move_piece(*data_recive)
-            my_turn = True
 
     network.disconnect()
     pygame.quit()

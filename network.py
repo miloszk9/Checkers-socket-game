@@ -28,7 +28,13 @@ class Network:
             return False
 
     def recive(self):
-        reply = self.client.recv(2048 * 4)
+        self.client.settimeout(.1)
+
+        try:
+            reply = self.client.recv(2048 * 4)
+        except socket.timeout as t:
+            print(t)
+            return None
 
         try:
             reply = pickle.loads(reply)
