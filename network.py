@@ -5,7 +5,7 @@ import socket
 class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host = "192.168.0.11"  # To be changed to your local IP address
+        self.host = "172.17.177.9"  # To be changed to your local IP address
         self.port = 8999
         self.addr = (self.host, self.port)
 

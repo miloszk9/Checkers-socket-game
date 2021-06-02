@@ -59,7 +59,7 @@ class Board:
         for row in range(8):
             for col in range(8):
                 if self.board_pieces[row][col] is not None:
-                    window.blit(self.board_pieces[row][col].image,
+                    window.blit(pygame.transform.scale((self.board_pieces[row][col].image), (SQUARE_SIZE, SQUARE_SIZE)),
                                 pygame.Rect(col*SQUARE_SIZE, row*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     def is_piece(self, x, y):

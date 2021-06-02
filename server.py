@@ -39,7 +39,7 @@ def threaded_client(connection, player_id, opponent_id, lobby_id, starting):
         print(e)
 
 if __name__ == '__main__':
-    hostIp = "192.168.0.11"  # Change to your local IP address
+    hostIp = "172.17.177.9"  # Change to your local IP address
     port = 8999
 
     s = socket(AF_INET, SOCK_STREAM)
