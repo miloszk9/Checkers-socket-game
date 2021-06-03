@@ -2,7 +2,7 @@ import numpy as np
 from pygame import draw
 from piece import Piece
 import pygame
-from constants import BLACK, BRIGHT, BRIGHT, COLS, DARK, ROWS, SQUARE_SIZE, WHITE
+from constants import BLACK, BRIGHT, LIGHT_YELLOW, COLS, DARK, ROWS, SQUARE_SIZE, WHITE
 
 class Board:
     def __init__(self):
@@ -52,8 +52,11 @@ class Board:
     def draw_board(self, window):
         window.fill(DARK)
         for row in range(ROWS):
-            for col in range(row % 2, ROWS, 2):
-                pygame.draw.rect(window, BRIGHT, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+            for col in range(COLS):
+                if self.board_color[row][col] == 0:
+                    pygame.draw.rect(window, BRIGHT, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                elif self.board_color[row][col] == 2: # Color spaces in different color (available spaces to move clicked pawn)
+                    pygame.draw.rect(window, LIGHT_YELLOW, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
 
     def draw_pieces(self, window):
         for row in range(8):
@@ -67,6 +70,27 @@ class Board:
             return True
         else:
             return False
+
+    def check_moves(self, x, y):
+        self.color_board() # Reset board colors
+
+        moves = []
+        
+        # Check move to the left
+        if x != 0 and y != 0:
+            if not self.is_piece(x-1, y-1):
+                moves.append((x-1, y-1))
+
+        # Check move to the right
+        if x != 7 and y != 0:
+            if not self.is_piece(x+1, y-1):
+                moves.append((x+1, y-1))
+
+        for move in moves:
+            self.board_color[move[0]][move[1]] = 2
+
+        return moves
+
 
     def move_piece(self, start_x, start_y, dest_x, dest_y):
         self.board_pieces[dest_y][dest_x] = self.board_pieces[start_y][start_x]
