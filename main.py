@@ -7,30 +7,50 @@ from network import Network
 def clicked_pos(position):
     return int(position[0]/(WIDTH/ROWS)), int(position[1]/(HEIGHT/COLS))
 
+def flip_coords(x, y):
+    # Function to flip coords before sending data to opponent
+    # e.g (0,0) -> (7,7), (2,4) -> (5,3) 
+    return abs(7 - x), abs(7 - y)
+
 def turn(x, y, piece_clicked):
     global my_turn
 
     if not piece_clicked: # When user is going to click a pawn
-        if board.is_piece(x, y):
+        if board.is_player_piece(x, y):
             print('Piece clicked')
-            return (x, y)
+            # TODO: change piece_clicked to dict - with 'clicked_coords', and 'available_moves'
+            # Dont flip entire board, just send reverse coords to opponent
+            moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
+            print(moves)
+            return {'coords': (x, y), 'moves': moves}
         else:
             print('Piece not clicked')
             return None
     else:
         if board.is_piece(x, y):
-            if (piece_clicked[0] == x and piece_clicked[1] == y):
+            if piece_clicked['coords'][0] == x and piece_clicked['coords'][1] == y:
                 print('Piece unclicked')
+                board.color_board()
                 return None        
-            else:
+            elif board.is_player_piece(x, y):
                 print('Piece clicked')
-                return (x, y)
-        elif board.is_piece(x, y) == False:
-            print('Moved')
-            board.move_piece(*piece_clicked, x, y)
-            network.send((*piece_clicked, x, y))
-            my_turn = False
-            return None
+                moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
+                print(moves)
+                return {'coords': (x, y), 'moves': moves}
+            else:
+                print('User clicked opponent pawn')
+                board.color_board()
+                return None
+        elif board.is_player_piece(x, y) == False:
+            if (x, y) in piece_clicked['moves']:
+                print('Moved')
+                board.color_board()
+                board.move_piece(*piece_clicked['coords'], x, y)
+                network.send((*flip_coords(*piece_clicked['coords']), *flip_coords(x, y)))
+                my_turn = False
+                return None
+            else:
+                return piece_clicked
         else:
             print('Not Moved')
             return piece_clicked
@@ -53,7 +73,8 @@ def main():
         board.draw_board(WINDOW)
         board.draw_pieces(WINDOW)
         if(piece_clicked):
-            pygame.draw.circle(WINDOW, (255,255,255), (x*SQUARE_SIZE+SQUARE_SIZE/2, y*SQUARE_SIZE+SQUARE_SIZE/2), 10)
+            pygame.draw.circle(WINDOW, (255,255,255), (piece_clicked['coords'][0]*SQUARE_SIZE+SQUARE_SIZE/2, 
+                                                       piece_clicked['coords'][1]*SQUARE_SIZE+SQUARE_SIZE/2), 10)
         pygame.display.update()
 
         if my_turn == False:
