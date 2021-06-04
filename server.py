@@ -1,4 +1,4 @@
-import _pickle as pickle
+import pickle as pickle
 from _thread import *
 from socket import *
 
@@ -39,7 +39,7 @@ def threaded_client(connection, player_id, opponent_id, lobby_id, starting):
         print(e)
 
 if __name__ == '__main__':
-    hostIp = "172.17.177.9"  # Change to your local IP address
+    hostIp = "192.168.0.164"  # Change to your local IP address
     port = 8999
 
     s = socket(AF_INET, SOCK_STREAM)

@@ -80,6 +80,15 @@ class Board:
         else:
             return False
 
+    def is_opponent_piece(self, x, y):
+        if self.board_pieces[y][x] is not None:
+            if self.board_pieces[y][x].color == 'white':
+                return True
+            else:
+                return False
+        else:
+            return False
+
     def check_moves(self, x, y):
         self.color_board() # Reset board colors
 
@@ -99,6 +108,38 @@ class Board:
             self.board_color[move[0]][move[1]] = 2
 
         return moves
+
+    def check_kill(self, x, y):
+        self.color_board() # Reset board colors
+
+        kills = []
+        
+        # Check kill to the left
+        if x > 1 and y > 1:
+            if self.is_opponent_piece(x-1, y-1) and not self.is_piece(x-2, y-2):
+                kills.append((x-2, y-2))
+
+        # Check kill to the right
+        if x < 6 and y > 1:
+            if self.is_opponent_piece(x+1, y-1) and not self.is_piece(x+2, y-2):
+                kills.append((x+2, y-2))
+
+        for kill in kills:
+            self.board_color[kill[0]][kill[1]] = 2
+
+        return kills
+
+
+    def available_kills(self):
+        kill_list = []
+        
+        for x in range(8):
+            for y in range(8):
+                if self.is_player_piece(x, y):
+                    if len(self.check_kill(x, y)) > 0: 
+                        kill_list.append([x,y, self.check_kill(x, y)])
+
+        return kill_list
 
 
     def move_piece(self, start_x, start_y, dest_x, dest_y):
