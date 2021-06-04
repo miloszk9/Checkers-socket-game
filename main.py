@@ -1,25 +1,22 @@
 import pygame
 from constants import SQUARE_SIZE, WIDTH, HEIGHT, ROWS, COLS
 from board import Board
-
-'''
-consts for window
-'''
-FPS = 15
-programIcon = pygame.image.load('assets/icon.png')
-
-
-WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption('Warcaby')
-pygame.display.set_icon(programIcon)
+from network import Network
 
 
 def clicked_pos(position):
     return int(position[0]/(WIDTH/ROWS)), int(position[1]/(HEIGHT/COLS))
 
+def flip_coords(x, y):
+    # Function to flip coords before sending data to opponent
+    # e.g (0,0) -> (7,7), (2,4) -> (5,3) 
+    return abs(7 - x), abs(7 - y)
+
 def turn(x, y, piece_clicked):
-    if not piece_clicked: # We want to click an empty space
-        if board.is_piece(x, y): # We want to click a piece
+    global my_turn
+
+    if not piece_clicked: # When user is going to click a pawn
+        if board.is_player_piece(x, y):
             print('Piece clicked')
             moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
             print(moves)
@@ -33,16 +30,22 @@ def turn(x, y, piece_clicked):
                 print('Piece unclicked')
                 board.color_board()
                 return None        
-            else:
+            elif board.is_player_piece(x, y):
                 print('Piece clicked')
                 moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
                 print(moves)
                 return {'coords': (x, y), 'moves': moves}
-        elif board.is_piece(x, y) == False:
+            else:
+                print('User clicked opponent pawn')
+                board.color_board()
+                return None
+        elif board.is_player_piece(x, y) == False:
             if (x, y) in piece_clicked['moves']:
                 print('Moved')
                 board.color_board()
                 board.move_piece(*piece_clicked['coords'], x, y)
+                network.send((*flip_coords(*piece_clicked['coords']), *flip_coords(x, y)))
+                my_turn = False
                 return None
             else:
                 return piece_clicked
@@ -50,25 +53,20 @@ def turn(x, y, piece_clicked):
             print('Not Moved')
             return piece_clicked
 
-if __name__ == '__main__':
+def main():
+    global board, my_turn
+
+    my_turn = network.connect()
+    
+    if my_turn:
+        _ = network.recive()
+
+    send = False
     run = True
-    clock = pygame.time.Clock()
-    board = Board()
     piece_clicked = None
 
     while run:
         clock.tick(FPS)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                x, y =  clicked_pos(pos)
-                print("X: "+ str(x) + ' Y: ' + str(y))
-                piece_clicked = turn(x, y, piece_clicked)
-                print('Piece clicked: '+str(piece_clicked))
 
         board.draw_board(WINDOW)
         board.draw_pieces(WINDOW)
@@ -77,4 +75,48 @@ if __name__ == '__main__':
                                                        piece_clicked['coords'][1]*SQUARE_SIZE+SQUARE_SIZE/2), 10)
         pygame.display.update()
 
+        if my_turn == False:
+            print('Wait for response...')
+            data_recive = network.recive()
+            
+            if data_recive is not None:
+                board.move_piece(*data_recive)
+                my_turn = True
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if my_turn == True:
+                    pos = pygame.mouse.get_pos()
+                    x, y =  clicked_pos(pos)
+                    print("X: "+ str(x) + ' Y: ' + str(y))
+                    piece_clicked = turn(x, y, piece_clicked)
+                    print('Piece clicked: '+str(piece_clicked))
+
+    network.disconnect()
     pygame.quit()
+    quit()
+
+if __name__ == '__main__':
+    '''
+    consts for window
+    '''
+    FPS = 15
+    programIcon = pygame.image.load('assets/icon.png')
+
+    WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption('Warcaby')
+    pygame.display.set_icon(programIcon)
+
+    '''
+    Game global variables
+    '''
+    clock = pygame.time.Clock()
+    board = Board()
+    my_turn = None
+
+    network = Network()
+
+    main()

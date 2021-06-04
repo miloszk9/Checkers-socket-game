@@ -71,6 +71,15 @@ class Board:
         else:
             return False
 
+    def is_player_piece(self, x, y):
+        if self.board_pieces[y][x] is not None:
+            if self.board_pieces[y][x].color == 'black':
+                return True
+            else:
+                return False
+        else:
+            return False
+
     def check_moves(self, x, y):
         self.color_board() # Reset board colors
 

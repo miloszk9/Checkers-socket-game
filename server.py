@@ -21,9 +21,7 @@ def threaded_client(connection, player_id, opponent_id, lobby_id, starting):
                 connection.send(send_data)
 
                 data = connection.recv(2048 * 4)
-                update = pickle.loads(data)
-
-                lobbies[lobby_id]['data'].append(update)
+                lobbies[lobby_id]['data'] = pickle.loads(data)
 
                 lobbies[lobby_id]['client_turn'] = opponent_id
 
@@ -41,7 +39,7 @@ def threaded_client(connection, player_id, opponent_id, lobby_id, starting):
         print(e)
 
 if __name__ == '__main__':
-    hostIp = "192.168.0.11"  # Change to your local IP address
+    hostIp = "172.17.177.9"  # Change to your local IP address
     port = 8999
 
     s = socket(AF_INET, SOCK_STREAM)

@@ -5,7 +5,7 @@ import socket
 class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host = "192.168.0.11"  # To be changed to your local IP address
+        self.host = "172.17.177.9"  # To be changed to your local IP address
         self.port = 8999
         self.addr = (self.host, self.port)
 
@@ -28,7 +28,13 @@ class Network:
             return False
 
     def recive(self):
-        reply = self.client.recv(2048 * 4)
+        self.client.settimeout(.1)
+
+        try:
+            reply = self.client.recv(2048 * 4)
+        except socket.timeout as t:
+            print(t)
+            return None
 
         try:
             reply = pickle.loads(reply)
