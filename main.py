@@ -21,8 +21,6 @@ def turn(x, y, piece_clicked):
     if not piece_clicked: # We want to click an empty space
         if board.is_piece(x, y): # We want to click a piece
             print('Piece clicked')
-            # TODO: change piece_clicked to dict - with 'clicked_coords', and 'available_moves'
-            # Dont flip entire board, just send reverse coords to opponent
             moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
             print(moves)
             return {'coords': (x, y), 'moves': moves}
