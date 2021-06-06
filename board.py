@@ -90,8 +90,6 @@ class Board:
             return False
 
     def check_moves(self, x, y):
-        self.color_board() # Reset board colors
-
         moves = []
         
         # Check move to the left
@@ -104,10 +102,12 @@ class Board:
             if not self.is_piece(x+1, y-1):
                 moves.append((x+1, y-1))
 
+        return moves
+
+    def color_moves(self, moves):
+        self.color_board() # Reset board colors
         for move in moves:
             self.board_color[move[0]][move[1]] = 2
-
-        return moves
 
     def check_kill(self, x, y):
         self.color_board() # Reset board colors
@@ -124,20 +124,21 @@ class Board:
             if self.is_opponent_piece(x+1, y-1) and not self.is_piece(x+2, y-2):
                 kills.append((x+2, y-2))
 
-        for kill in kills:
-            self.board_color[kill[0]][kill[1]] = 2
+        '''for kill in kills:
+            self.board_color[kill[0]][kill[1]] = 2'''
 
         return kills
 
 
     def available_kills(self):
-        kill_list = []
+        kill_list = {}
         
         for x in range(8):
             for y in range(8):
                 if self.is_player_piece(x, y):
                     if len(self.check_kill(x, y)) > 0: 
-                        kill_list.append([x,y, self.check_kill(x, y)])
+                        #kill_list.append([x,y, self.check_kill(x, y)])
+                        kill_list[(x, y)] = self.check_kill(x, y)
 
         return kill_list
 

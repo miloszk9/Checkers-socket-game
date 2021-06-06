@@ -10,10 +10,7 @@ class Piece:
         self.color = color
         self.image = image
         self.super = False
-        self.dead = False        
     
     def make_super(self):
         self.super = True
     
-    def make_dead(self):
-        self.dead = False
