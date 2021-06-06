@@ -78,7 +78,7 @@ def turn(x, y, piece_clicked):
                 if (x, y) in available_kills[piece_clicked['coords']]:
                     x_killed = (piece_clicked['coords'][0] + x)/2
                     y_killed = (piece_clicked['coords'][1] + y)/2
-                    kill_piece(x_killed, y_killed)
+                    kill_piece([[int(x_killed), int(y_killed)]])
 
                     print("x_killed", x_killed, "y_killed", y_killed)
 
