@@ -3,14 +3,24 @@ import socket
 
 
 class Network:
-    def __init__(self):
+    def __init__(self, argv):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host = "192.168.0.164"  # To be changed to your local IP address
+       
+        if len(argv) > 1:
+            self.host = argv[1]
+        else:
+            hostname = socket.gethostname()
+            self.host = socket.gethostbyname(hostname)
+        
         self.port = 8999
-        self.addr = (self.host, self.port)
 
     def connect(self):
-        self.client.connect(self.addr)
+        try:
+            self.client.connect((self.host, self.port))
+        except:
+            hostname = socket.gethostname()
+            self.host = socket.gethostbyname(hostname)
+            self.client.connect((self.host, self.port))
         data = self.client.recv(2048 * 4)
         return pickle.loads(data)
 

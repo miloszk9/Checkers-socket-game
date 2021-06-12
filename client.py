@@ -2,7 +2,7 @@ import pygame
 from constants import SQUARE_SIZE, WIDTH, HEIGHT, ROWS, COLS
 from board import Board
 from network import Network
-
+from sys import argv
 
 def clicked_pos(position):
     return int(position[0]/(WIDTH/ROWS)), int(position[1]/(HEIGHT/COLS))
@@ -167,6 +167,6 @@ if __name__ == '__main__':
     board = Board()
     my_turn = None
 
-    network = Network()
+    network = Network(argv)
 
     main()

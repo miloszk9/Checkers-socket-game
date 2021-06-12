@@ -1,6 +1,7 @@
 import pickle as pickle
 from _thread import *
 from socket import *
+from sys import argv
 
 
 def threaded_client(connection, player_id, opponent_id, lobby_id, starting): 
@@ -39,7 +40,11 @@ def threaded_client(connection, player_id, opponent_id, lobby_id, starting):
         print(e)
 
 if __name__ == '__main__':
-    hostIp = "192.168.0.164"  # Change to your local IP address
+    if len(argv) > 1:
+        hostIp = argv[1]
+    else:
+        hostname = gethostname()
+        hostIp = gethostbyname(hostname)
     port = 8999
 
     s = socket(AF_INET, SOCK_STREAM)
@@ -49,6 +54,9 @@ if __name__ == '__main__':
         s.bind((hostIp, port))
     except error as e:
         print(str(e))
+        hostname = gethostname()
+        hostIp = gethostbyname(hostname)
+        s.bind((hostIp, port))
     try:
         s.listen(2)  # max 2 users in queue
     except error as e:
