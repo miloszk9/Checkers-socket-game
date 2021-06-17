@@ -19,10 +19,6 @@ def flip_coords_list(list):
 
     return flipped
 
-def kill_piece(kill_list):
-    for x, y in kill_list:
-        board.board_pieces[y][x] = None
-
 def turn(x, y, piece_clicked):
     global my_turn
 
@@ -78,7 +74,7 @@ def turn(x, y, piece_clicked):
                 if (x, y) in available_kills[piece_clicked['coords']]:
                     x_killed = (piece_clicked['coords'][0] + x)/2
                     y_killed = (piece_clicked['coords'][1] + y)/2
-                    kill_piece([[int(x_killed), int(y_killed)]])
+                    board.kill_piece([[int(x_killed), int(y_killed)]])
 
                     print("x_killed", x_killed, "y_killed", y_killed)
 
@@ -92,7 +88,6 @@ def turn(x, y, piece_clicked):
                         board.color_moves(piece_clicked['moves'])
                         return piece_clicked
                     else:
-                        kill_piece(piece_clicked['to_kill'])
                         network.send((*flip_coords(*piece_clicked['init_coords']), *flip_coords(x, y), flip_coords_list(piece_clicked['to_kill']))) #added killed pieces coords (list) in send data
                         my_turn = False
                         return None
@@ -130,7 +125,7 @@ def main():
                 print("Recieved data: ", data_recive)
                 board.move_piece(data_recive[0], data_recive[1], data_recive[2], data_recive[3])
                 if len(data_recive) > 4:
-                    kill_piece(data_recive[4])
+                    board.kill_piece(data_recive[4])
                 my_turn = True
 
         for event in pygame.event.get():
@@ -167,6 +162,5 @@ if __name__ == '__main__':
     board = Board()
     my_turn = None
 
-    network = Network(argv)
-
+    network = Network(argv) # argv - arguments passed in console (ip address in our case)
     main()

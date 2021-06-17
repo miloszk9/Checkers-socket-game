@@ -9,6 +9,9 @@ class Board:
         self.board_color = []
         self.board_pieces = []
         self.starting_list = []
+        self.available_kills_len = 0
+        self.pieces_player_len = 12
+        self.pieces_opponent_len = 12
         self.color_board()
         self.create_board()
 
@@ -140,9 +143,20 @@ class Board:
                         #kill_list.append([x,y, self.check_kill(x, y)])
                         kill_list[(x, y)] = self.check_kill(x, y)
 
+        self.available_kills_len = len(kill_list)
+
         return kill_list
 
 
     def move_piece(self, start_x, start_y, dest_x, dest_y):
         self.board_pieces[dest_y][dest_x] = self.board_pieces[start_y][start_x]
         self.board_pieces[start_y][start_x] = None
+
+    def kill_piece(self, kill_list):
+        for x, y in kill_list:
+            if self.board_pieces[y][x].color == 'black':
+                self.pieces_player_len -= 1
+            else:
+                self.pieces_opponent_len -= 1
+
+            self.board_pieces[y][x] = None
