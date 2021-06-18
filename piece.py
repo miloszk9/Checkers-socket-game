@@ -12,5 +12,17 @@ class Piece:
         self.super = False
     
     def make_super(self):
+        # TODO: Change image, is_player_piece() and is_opponent_piece() can be used
         self.super = True
     
+    def is_player_piece(self):
+        if self.color == 'black':
+            return True
+        else:
+            return False
+
+    def is_opponent_piece(self):
+        if self.color == 'white':
+            return True
+        else:
+            return False

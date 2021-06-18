@@ -26,7 +26,7 @@ def turn(x, y, piece_clicked):
     print("kill list: ", available_kills)
 
     if not piece_clicked: # When user is going to click a pawn
-        if board.is_player_piece(x, y):
+        if board.is_piece(x, y) and board.board_pieces[y][x].is_player_piece():
             if len(available_kills) == 0: # No kills are available
                 print('Piece clicked')
                 moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
@@ -50,7 +50,7 @@ def turn(x, y, piece_clicked):
                 print('Piece unclicked')
                 board.color_board()
                 return None        
-            elif board.is_player_piece(x, y):
+            elif board.is_piece(x, y) and board.board_pieces[y][x].is_player_piece():
                 # Change to other piece
                 return turn(x, y, None)
             else:
@@ -68,6 +68,7 @@ def turn(x, y, piece_clicked):
                     my_turn = False
                     return None
                 else:
+                    board.color_moves(piece_clicked['moves'])
                     return piece_clicked
             else: #player has to kill piece
 
@@ -92,8 +93,14 @@ def turn(x, y, piece_clicked):
                         my_turn = False
                         return None
 
+                else:
+                    # Player has to kill piece, but he chooses wrong coord
+                    board.color_moves(piece_clicked['moves'])
+                    return piece_clicked
+
         else:
             print('Not Moved')
+            board.color_moves(piece_clicked['moves'])
             return piece_clicked
 
 def main():
@@ -122,7 +129,6 @@ def main():
             data_recive = network.recive()
             
             if data_recive is not None and len(data_recive) > 0:
-                print("Recieved data: ", data_recive)
                 board.move_piece(data_recive[0], data_recive[1], data_recive[2], data_recive[3])
                 if len(data_recive) > 4:
                     board.kill_piece(data_recive[4])

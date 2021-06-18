@@ -119,16 +119,13 @@ class Board:
         
         # Check kill to the left
         if x > 1 and y > 1:
-            if self.is_opponent_piece(x-1, y-1) and not self.is_piece(x-2, y-2):
+            if self.is_piece(x-1, y-1) and self.board_pieces[y-1][x-1].is_opponent_piece() and not self.is_piece(x-2, y-2):
                 kills.append((x-2, y-2))
 
         # Check kill to the right
         if x < 6 and y > 1:
-            if self.is_opponent_piece(x+1, y-1) and not self.is_piece(x+2, y-2):
+            if self.is_piece(x+1, y-1) and self.board_pieces[y-1][x+1].is_opponent_piece() and not self.is_piece(x+2, y-2):
                 kills.append((x+2, y-2))
-
-        '''for kill in kills:
-            self.board_color[kill[0]][kill[1]] = 2'''
 
         return kills
 
@@ -138,9 +135,8 @@ class Board:
         
         for x in range(8):
             for y in range(8):
-                if self.is_player_piece(x, y):
+                if self.is_piece(x, y) and self.board_pieces[y][x].is_player_piece():
                     if len(self.check_kill(x, y)) > 0: 
-                        #kill_list.append([x,y, self.check_kill(x, y)])
                         kill_list[(x, y)] = self.check_kill(x, y)
 
         self.available_kills_len = len(kill_list)
