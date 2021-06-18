@@ -2,7 +2,7 @@ import numpy as np
 from pygame import draw
 from piece import Piece
 import pygame
-from constants import BLACK, BRIGHT, LIGHT_YELLOW, COLS, DARK, ROWS, SQUARE_SIZE, WHITE
+from constants import BLACK, BRIGHT, HEIGHT, LIGHT_YELLOW, COLS, DARK, ROWS, SQUARE_SIZE, STATUS_BAR_COLOR, STATUS_BAR_HEIGHT, WHITE, WIDTH
 
 class Board:
     def __init__(self):
@@ -60,6 +60,7 @@ class Board:
                     pygame.draw.rect(window, BRIGHT, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
                 elif self.board_color[row][col] == 2: # Color spaces in different color (available spaces to move clicked pawn)
                     pygame.draw.rect(window, LIGHT_YELLOW, (row*SQUARE_SIZE, col*SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+        pygame.draw.rect(window, STATUS_BAR_COLOR, (0, HEIGHT, WIDTH, STATUS_BAR_HEIGHT))
 
     def draw_pieces(self, window):
         for row in range(8):

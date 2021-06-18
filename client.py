@@ -1,5 +1,5 @@
 import pygame
-from constants import SQUARE_SIZE, WIDTH, HEIGHT, ROWS, COLS
+from constants import SQUARE_SIZE, STATUS_BAR_HEIGHT, STATUS_COLOR, WIDTH, HEIGHT, ROWS, COLS
 from board import Board
 from network import Network
 from sys import argv
@@ -22,7 +22,6 @@ def flip_coords_list(list):
 
 def turn(x, y, piece_clicked):
     global my_turn
-
     available_kills = board.available_kills()
     print("kill list: ", available_kills)
 
@@ -104,6 +103,13 @@ def turn(x, y, piece_clicked):
             board.color_moves(piece_clicked['moves'])
             return piece_clicked
 
+def status_display(status):
+    font = pygame.font.Font('freesansbold.ttf', 12)
+    textSurface = font.render(status, True, STATUS_COLOR)
+    textRect = textSurface.get_rect()
+    textRect.center = (WIDTH // 2, HEIGHT+STATUS_BAR_HEIGHT//2)
+    WINDOW.blit(textSurface, textRect)
+
 def main():
     global board, my_turn
 
@@ -112,6 +118,7 @@ def main():
     if my_turn:
         _ = network.recive()
 
+    status = ''
     send = False
     run = True
     piece_clicked = None
@@ -130,9 +137,11 @@ def main():
         if(piece_clicked):
             pygame.draw.circle(WINDOW, (255,255,255), (piece_clicked['coords'][0]*SQUARE_SIZE+SQUARE_SIZE/2, 
                                                        piece_clicked['coords'][1]*SQUARE_SIZE+SQUARE_SIZE/2), 10)
+        status_display(status)
         pygame.display.update()
 
         if my_turn == False:
+            status = 'Opponent\'s turn!'
             data_recive = network.recive()
             
             if data_recive is not None and len(data_recive) > 0:
@@ -140,6 +149,7 @@ def main():
                 if len(data_recive) > 4:
                     board.kill_piece(data_recive[4])
                 my_turn = True
+        else: status = 'Your turn!'
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -148,10 +158,13 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if my_turn == True:
                     pos = pygame.mouse.get_pos()
-                    x, y =  clicked_pos(pos)
-                    print("X: "+ str(x) + ' Y: ' + str(y))
-                    piece_clicked = turn(x, y, piece_clicked)
-                    print('Piece clicked: '+str(piece_clicked))
+                    if(pos[1] < HEIGHT):
+                        x, y =  clicked_pos(pos)
+                        print("X: "+ str(x) + ' Y: ' + str(y))
+                        piece_clicked = turn(x, y, piece_clicked)
+                        print('Piece clicked: '+str(piece_clicked))
+                    else:
+                        pass
 
     sleep(5)
     network.disconnect()
@@ -165,9 +178,10 @@ if __name__ == '__main__':
     FPS = 15
     programIcon = pygame.image.load('assets/icon.png')
 
-    WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
+    WINDOW = pygame.display.set_mode((WIDTH, HEIGHT+STATUS_BAR_HEIGHT))
     pygame.display.set_caption('Warcaby')
     pygame.display.set_icon(programIcon)
+    pygame.font.init()
 
     '''
     Game global variables
