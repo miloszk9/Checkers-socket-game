@@ -3,6 +3,7 @@ from constants import SQUARE_SIZE, WIDTH, HEIGHT, ROWS, COLS
 from board import Board
 from network import Network
 from sys import argv
+from time import sleep
 
 def clicked_pos(position):
     return int(position[0]/(WIDTH/ROWS)), int(position[1]/(HEIGHT/COLS))
@@ -118,6 +119,12 @@ def main():
     while run:
         clock.tick(FPS)
 
+        if board.pieces_player_len == 0: # Opponent win
+            run = False
+            
+        elif board.pieces_opponent_len == 0: # Player win
+            run = False
+
         board.draw_board(WINDOW)
         board.draw_pieces(WINDOW)
         if(piece_clicked):
@@ -146,6 +153,7 @@ def main():
                     piece_clicked = turn(x, y, piece_clicked)
                     print('Piece clicked: '+str(piece_clicked))
 
+    sleep(5)
     network.disconnect()
     pygame.quit()
     quit()
