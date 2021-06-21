@@ -15,12 +15,12 @@ class Network:
         self.port = 8999
 
     def connect(self):
+        self.client.settimeout(10)
         try:
             self.client.connect((self.host, self.port))
-        except:
-            hostname = socket.gethostname()
-            self.host = socket.gethostbyname(hostname)
-            self.client.connect((self.host, self.port))
+        except socket.timeout:
+            print('Time exceeded')
+            quit()
         data = self.client.recv(2048 * 4)
         return pickle.loads(data)
 
@@ -42,8 +42,7 @@ class Network:
 
         try:
             reply = self.client.recv(2048 * 4)
-        except socket.timeout as t:
-            #print(t)
+        except socket.timeout:
             return None
 
         try:
