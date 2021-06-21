@@ -128,9 +128,14 @@ def main():
 
         if board.pieces_player_len == 0: # Opponent win
             run = False
+            status = 'Opponent wins'
             
         elif board.pieces_opponent_len == 0: # Player win
             run = False
+            status = 'You win'
+
+        if board.available_kills_len > 0:
+            status = 'You have to kill!'
 
         board.draw_board(WINDOW)
         board.draw_pieces(WINDOW)
