@@ -108,6 +108,29 @@ class Board:
 
         return moves
 
+    def check_super_moves(self, x, y):
+        moves = []
+        
+        # Check move to the left
+        if x != 0 and y != 0:
+            if not self.is_piece(x-1, y-1):
+                moves.append((x-1, y-1))
+
+        # Check move to the right
+        if x != 7 and y != 0:
+            if not self.is_piece(x+1, y-1):
+                moves.append((x+1, y-1))
+
+        if x != 0 and y != 7:
+            if not self.is_piece(x-1, y+1):
+                moves.append((x-1, y+1))
+
+        if x != 7 and y != 7:
+            if not self.is_piece(x+1, y+1):
+                moves.append((x+1, y+1))
+
+        return moves
+
     def color_moves(self, moves):
         self.color_board() # Reset board colors
         for move in moves:
@@ -117,6 +140,33 @@ class Board:
         self.color_board() # Reset board colors
 
         kills = []
+        
+        # Check kill to the left
+        if x > 1 and y > 1:
+            if self.is_piece(x-1, y-1) and self.board_pieces[y-1][x-1].is_opponent_piece() and not self.is_piece(x-2, y-2):
+                kills.append((x-2, y-2))
+
+        # Check kill to the right
+        if x < 6 and y > 1:
+            if self.is_piece(x+1, y-1) and self.board_pieces[y-1][x+1].is_opponent_piece() and not self.is_piece(x+2, y-2):
+                kills.append((x+2, y-2))
+
+        return kills
+    
+
+    def check_super_kill(self, x, y):
+        self.color_board() # Reset board colors
+
+        kills = []
+        
+        if x > 1 and y < 6:
+            if self.is_piece(x-1, y+1) and self.board_pieces[y+1][x-1].is_opponent_piece() and not self.is_piece(x-2, y+2):
+                kills.append((x-2, y+2))
+
+        if x < 6 and y < 6:
+            if self.is_piece(x+1, y+1) and self.board_pieces[y+1][x+1].is_opponent_piece() and not self.is_piece(x+2, y+2):
+                kills.append((x+2, y+2))
+
         
         # Check kill to the left
         if x > 1 and y > 1:
@@ -144,6 +194,18 @@ class Board:
 
         return kill_list
 
+    def available_super_kills(self):
+        kill_list = {}
+        
+        for x in range(8):
+            for y in range(8):
+                if self.is_player_piece(x, y):
+                    if len(self.check_super_kill(x, y)) > 0: 
+                        kill_list[(x, y)] = self.check_super_kill(x, y)
+
+        self.available_kills_len = len(kill_list)
+
+        return kill_list
 
     def move_piece(self, start_x, start_y, dest_x, dest_y):
         self.board_pieces[dest_y][dest_x] = self.board_pieces[start_y][start_x]
@@ -157,3 +219,14 @@ class Board:
                 self.pieces_opponent_len -= 1
 
             self.board_pieces[y][x] = None
+
+    def make_super(self, x, y):
+        self.board_pieces[y][x].super = True
+        print("MAKE SUPER")
+
+    def is_super(self, x, y):
+        if self.board_pieces[y][x].super:
+            print("SUPERSUPERSUPERSUPERSUPERSUPERSUPERSUPERSUPER")
+            return True
+        else:
+            return False

@@ -26,3 +26,6 @@ class Piece:
             return True
         else:
             return False
+
+    def is_super(self):
+        return self.super

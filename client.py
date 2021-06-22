@@ -20,26 +20,49 @@ def flip_coords_list(list):
 
     return flipped
 
+def check_super(x, y):
+    if y == 0:
+        board.make_super(x, y)
+        print("--------------------------------------------SUPER WORKS--------------------------------------------------------")
+
 def turn(x, y, piece_clicked):
     global my_turn
     available_kills = board.available_kills()
     print("kill list: ", available_kills)
 
+    available_super_kills = board.available_super_kills()
+    print("kill list: ", available_kills)
+
     if not piece_clicked: # When user is going to click a pawn
         if board.is_piece(x, y) and board.board_pieces[y][x].is_player_piece():
-            if len(available_kills) == 0: # No kills are available
-                print('Piece clicked')
-                moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
-                board.color_moves(moves)
-                print(moves)
-            else: # kill is available
-                if (x, y) in available_kills:
+            if board.is_super(x, y):
+                if len(available_super_kills) == 0: # No kills are available
                     print('Piece clicked')
-                    moves = available_kills[(x, y)] # moves - tuple containing available moves - x,y coords
+                    moves = board.check_super_moves(x, y) # moves - tuple containing available moves - x,y coords
                     board.color_moves(moves)
-                    print(moves)
-                else:
-                    return None # There are available kills but wrong pawn was clicked
+
+                    print("Moves able to make without killing: ", moves)
+                else: # kill is available
+                    if (x, y) in available_super_kills:
+                        print('Piece clicked')
+                        moves = available_super_kills[(x, y)] # moves - tuple containing available moves - x,y coords   
+                        board.color_moves(moves)
+                        print("Killing moves: ", moves)
+                    else:
+                        return None # There are available kills but wrong pawn was clicked
+            else:
+                if len(available_kills) == 0: # No kills are available
+                    print('Piece clicked')
+                    moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
+                    board.color_moves(moves)
+                else: # kill is available
+                    if (x, y) in available_kills:
+                        print('Piece clicked')
+                        moves = available_kills[(x, y)] # moves - tuple containing available moves - x,y coords   
+                        board.color_moves(moves)
+                        print(moves)
+                    else:
+                        return None # There are available kills but wrong pawn was clicked
             return {'coords': (x, y), 'moves': moves, 'init_coords': (x, y), 'to_kill': []}
         else:
             print('Piece not clicked')
@@ -59,44 +82,81 @@ def turn(x, y, piece_clicked):
                 return None
         elif board.is_piece(x, y) == False:
 
-            if len(available_kills) == 0: # player doesnt have possibility of killing
-                if (x, y) in piece_clicked['moves']:
-                    print('Moved')
-                    board.color_board()
-                    board.move_piece(*piece_clicked['coords'], x, y)
-                    network.send((*flip_coords(*piece_clicked['coords']), *flip_coords(x, y)))
-                    my_turn = False
-                    return None
-                else:
-                    board.color_moves(piece_clicked['moves'])
-                    return piece_clicked
-            else: #player has to kill piece
+            
+            if board.is_super(*piece_clicked['coords']):                
+            
+                print("PIECE CLICKED CORDS FORM: ", piece_clicked['coords'])
 
-                if (x, y) in available_kills[piece_clicked['coords']]:
-                    x_killed = (piece_clicked['coords'][0] + x)/2
-                    y_killed = (piece_clicked['coords'][1] + y)/2
-                    board.kill_piece([[int(x_killed), int(y_killed)]])
+                print("IS PIECE SUPER?", board.is_super(*piece_clicked['coords']))
 
-                    print("x_killed", x_killed, "y_killed", y_killed)
-
-                    piece_clicked['to_kill'].append([int(x_killed),int(y_killed)])
-                    board.move_piece(*piece_clicked['coords'], x, y)
-
-                    available_kills = board.available_kills()
-                    if (x, y) in available_kills:
-                        piece_clicked['coords'] = (x, y)
-                        piece_clicked['moves'] = available_kills[(x, y)]
-                        board.color_moves(piece_clicked['moves'])
-                        return piece_clicked
-                    else:
-                        network.send((*flip_coords(*piece_clicked['init_coords']), *flip_coords(x, y), flip_coords_list(piece_clicked['to_kill']))) #added killed pieces coords (list) in send data
+                if len(available_super_kills) == 0: # player doesnt have possibility of killing
+                    if (x, y) in piece_clicked['moves']:
+                        print('Moved')
+                        board.color_board()
+                        board.move_piece(*piece_clicked['coords'], x, y)
+                        check_super(x, y)
+                        network.send((*flip_coords(*piece_clicked['coords']), *flip_coords(x, y)))
                         my_turn = False
                         return None
+                    else:
+                        board.color_moves(piece_clicked['moves'])
+                        return piece_clicked
+                else: #player has to kill piece
+                        if (x, y) in available_super_kills[piece_clicked['coords']]: 
+                            x_killed = (piece_clicked['coords'][0] + x)/2
+                            y_killed = (piece_clicked['coords'][1] + y)/2
+                            board.kill_piece([[int(x_killed), int(y_killed)]])
 
-                else:
-                    # Player has to kill piece, but he chooses wrong coord
-                    board.color_moves(piece_clicked['moves'])
-                    return piece_clicked
+                            print("x_killed", x_killed, "y_killed", y_killed)
+
+                            piece_clicked['to_kill'].append([int(x_killed),int(y_killed)])
+                            board.move_piece(*piece_clicked['coords'], x, y)
+                            check_super(x, y)
+                            available_super_kills = board.available_super_kills()
+                            if (x, y) in available_super_kills:
+                                piece_clicked['coords'] = (x, y)
+                                piece_clicked['moves'] = available_super_kills[(x, y)]
+                                board.color_moves(piece_clicked['moves'])
+                                return piece_clicked
+                            else:
+                                network.send((*flip_coords(*piece_clicked['init_coords']), *flip_coords(x, y), flip_coords_list(piece_clicked['to_kill']))) #added killed pieces coords (list) in send data
+                                my_turn = False
+                                return None
+
+            else:
+                if len(available_kills) == 0: # player doesnt have possibility of killing
+                    if (x, y) in piece_clicked['moves']:
+                        print('Moved')
+                        board.color_board()
+                        board.move_piece(*piece_clicked['coords'], x, y)
+                        check_super(x, y)
+                        network.send((*flip_coords(*piece_clicked['coords']), *flip_coords(x, y)))
+                        my_turn = False
+                        return None
+                    else:
+                        board.color_moves(piece_clicked['moves'])
+                        return piece_clicked
+                else: #player has to kill piece
+                        if (x, y) in available_kills[piece_clicked['coords']]: 
+                            x_killed = (piece_clicked['coords'][0] + x)/2
+                            y_killed = (piece_clicked['coords'][1] + y)/2
+                            board.kill_piece([[int(x_killed), int(y_killed)]])
+
+                            print("x_killed", x_killed, "y_killed", y_killed)
+
+                            piece_clicked['to_kill'].append([int(x_killed),int(y_killed)])
+                            board.move_piece(*piece_clicked['coords'], x, y)
+                            check_super(x, y)
+                            available_kills = board.available_kills()
+                            if (x, y) in available_kills:
+                                piece_clicked['coords'] = (x, y)
+                                piece_clicked['moves'] = available_kills[(x, y)]
+                                board.color_moves(piece_clicked['moves'])
+                                return piece_clicked
+                            else:
+                                network.send((*flip_coords(*piece_clicked['init_coords']), *flip_coords(x, y), flip_coords_list(piece_clicked['to_kill']))) #added killed pieces coords (list) in send data
+                                my_turn = False
+                                return None
 
         else:
             print('Not Moved')
