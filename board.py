@@ -109,17 +109,7 @@ class Board:
         return moves
 
     def check_super_moves(self, x, y):
-        moves = []
-        
-        # Check move to the left
-        if x != 0 and y != 0:
-            if not self.is_piece(x-1, y-1):
-                moves.append((x-1, y-1))
-
-        # Check move to the right
-        if x != 7 and y != 0:
-            if not self.is_piece(x+1, y-1):
-                moves.append((x+1, y-1))
+        moves = self.check_moves(x,y) # Check regular moves to the top
 
         if x != 0 and y != 7:
             if not self.is_piece(x-1, y+1):
@@ -155,9 +145,7 @@ class Board:
     
 
     def check_super_kill(self, x, y):
-        self.color_board() # Reset board colors
-
-        kills = []
+        kills = self.check_kill(x, y) # Check regular kills to the top
         
         if x > 1 and y < 6:
             if self.is_piece(x-1, y+1) and self.board_pieces[y+1][x-1].is_opponent_piece() and not self.is_piece(x-2, y+2):
@@ -166,17 +154,6 @@ class Board:
         if x < 6 and y < 6:
             if self.is_piece(x+1, y+1) and self.board_pieces[y+1][x+1].is_opponent_piece() and not self.is_piece(x+2, y+2):
                 kills.append((x+2, y+2))
-
-        
-        # Check kill to the left
-        if x > 1 and y > 1:
-            if self.is_piece(x-1, y-1) and self.board_pieces[y-1][x-1].is_opponent_piece() and not self.is_piece(x-2, y-2):
-                kills.append((x-2, y-2))
-
-        # Check kill to the right
-        if x < 6 and y > 1:
-            if self.is_piece(x+1, y-1) and self.board_pieces[y-1][x+1].is_opponent_piece() and not self.is_piece(x+2, y-2):
-                kills.append((x+2, y-2))
 
         return kills
 
@@ -211,6 +188,11 @@ class Board:
         self.board_pieces[dest_y][dest_x] = self.board_pieces[start_y][start_x]
         self.board_pieces[start_y][start_x] = None
 
+        # Check if the piece should change to seper (king)
+        piece = self.board_pieces[dest_y][dest_x]
+        if dest_y == 0 and piece.color == 'black' or dest_y == 7 and piece.color == 'white':
+            piece.make_super()
+
     def kill_piece(self, kill_list):
         for x, y in kill_list:
             if self.board_pieces[y][x].color == 'black':
@@ -221,7 +203,7 @@ class Board:
             self.board_pieces[y][x] = None
 
     def make_super(self, x, y):
-        self.board_pieces[y][x].super = True
+        self.board_pieces[y][x].make_super()
         print("MAKE SUPER")
 
     def is_super(self, x, y):

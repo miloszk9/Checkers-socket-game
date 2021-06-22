@@ -1,4 +1,4 @@
-from constants import SQUARE_SIZE, WHITE
+from constants import SQUARE_SIZE, WHITE, WHITE_KING, BLACK_KING
 
 
 class Piece:
@@ -12,8 +12,11 @@ class Piece:
         self.super = False
     
     def make_super(self):
-        # TODO: Change image, is_player_piece() and is_opponent_piece() can be used
         self.super = True
+        if self.is_player_piece():
+            self.image = BLACK_KING
+        else:
+            self.image = WHITE_KING
     
     def is_player_piece(self):
         if self.color == 'black':
