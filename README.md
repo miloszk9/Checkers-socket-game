@@ -29,3 +29,8 @@ $ python server.py 192.168.0.1
 $ python client.py 192.168.0.1
 $ python client.py 192.168.0.1
 ```
+
+## Example screenshots
+![screen1](https://github.com/miloszk9/Checkers-socket-game/blob/main/example_screenshots/checkers1.png?raw=true)
+![screen2](https://github.com/miloszk9/Checkers-socket-game/blob/main/example_screenshots/checkers2.png?raw=true)
+![screen3](https://github.com/miloszk9/Checkers-socket-game/blob/main/example_screenshots/checkers3.png?raw=true)
