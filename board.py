@@ -204,11 +204,9 @@ class Board:
 
     def make_super(self, x, y):
         self.board_pieces[y][x].make_super()
-        print("MAKE SUPER")
 
     def is_super(self, x, y):
         if self.board_pieces[y][x].super:
-            print("SUPERSUPERSUPERSUPERSUPERSUPERSUPERSUPERSUPER")
             return True
         else:
             return False

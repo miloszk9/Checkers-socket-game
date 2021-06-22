@@ -32,61 +32,49 @@ def turn(x, y, piece_clicked):
         if board.is_piece(x, y) and board.board_pieces[y][x].is_player_piece():
             if board.is_super(x, y):
                 if len(available_super_kills) == 0: # No kills are available
-                    print('Piece clicked')
+                    # Piece clicked
                     moves = board.check_super_moves(x, y) # moves - tuple containing available moves - x,y coords
                     board.color_moves(moves)
-
-                    print("Moves able to make without killing: ", moves)
                 else: # kill is available
                     if (x, y) in available_super_kills:
-                        print('Piece clicked')
                         moves = available_super_kills[(x, y)] # moves - tuple containing available moves - x,y coords   
                         board.color_moves(moves)
-                        print("Killing moves: ", moves)
                     else:
                         return None # There are available kills but wrong pawn was clicked
             else:
                 if len(available_kills) == 0: # No kills are available
-                    print('Piece clicked')
+                    # Piece clicked
                     moves = board.check_moves(x, y) # moves - tuple containing available moves - x,y coords
                     board.color_moves(moves)
                 else: # kill is available
                     if (x, y) in available_kills:
-                        print('Piece clicked')
                         moves = available_kills[(x, y)] # moves - tuple containing available moves - x,y coords   
                         board.color_moves(moves)
-                        print(moves)
                     else:
                         return None # There are available kills but wrong pawn was clicked
             return {'coords': (x, y), 'moves': moves, 'init_coords': (x, y), 'to_kill': []}
         else:
-            print('Piece not clicked')
+            # Piece not clicked
             return None
     else:
         if board.is_piece(x, y) and len(piece_clicked['to_kill']) == 0: # when user hasnt killed any pieces in the current turn
             if piece_clicked['coords'][0] == x and piece_clicked['coords'][1] == y:
-                print('Piece unclicked')
+                # Piece unclicked
                 board.color_board()
                 return None        
             elif board.is_piece(x, y) and board.board_pieces[y][x].is_player_piece():
                 # Change to other piece
                 return turn(x, y, None)
             else:
-                print('User clicked opponent pawn')
+                # User clicked opponent pawn
                 board.color_board()
                 return None
         elif board.is_piece(x, y) == False:
 
             
-            if board.is_super(*piece_clicked['coords']):                
-            
-                print("PIECE CLICKED CORDS FORM: ", piece_clicked['coords'])
-
-                print("IS PIECE SUPER?", board.is_super(*piece_clicked['coords']))
-
+            if board.is_super(*piece_clicked['coords']):
                 if len(available_super_kills) == 0: # player doesnt have possibility of killing
                     if (x, y) in piece_clicked['moves']:
-                        print('Moved')
                         board.color_board()
                         board.move_piece(*piece_clicked['coords'], x, y)
                         network.send((*flip_coords(*piece_clicked['coords']), *flip_coords(x, y)))
@@ -122,7 +110,6 @@ def turn(x, y, piece_clicked):
             else:
                 if len(available_kills) == 0: # player doesnt have possibility of killing
                     if (x, y) in piece_clicked['moves']:
-                        print('Moved')
                         board.color_board()
                         board.move_piece(*piece_clicked['coords'], x, y)
                         network.send((*flip_coords(*piece_clicked['coords']), *flip_coords(x, y)))
@@ -156,7 +143,7 @@ def turn(x, y, piece_clicked):
                         return piece_clicked
 
         else:
-            print('Not Moved')
+            # Not Moved
             board.color_moves(piece_clicked['moves'])
             return piece_clicked
 
